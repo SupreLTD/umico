@@ -23,7 +23,7 @@ async def run_parser():
         links.extend(result)
 
     umico_price = await Umico(links)
-    await umico_price.parse_price
+    await umico_price.parse_price()
     await umico_price.browser.close()
     await umico_price.playwright.stop()
 
