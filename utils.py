@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from tenacity import retry
 import re
 from playwright.async_api import async_playwright
-from src.config import HEADERS
+from config import HEADERS
 
 
 async def get_product_links(session: ClientSession, url: str):
