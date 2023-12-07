@@ -18,7 +18,7 @@ class Umico:
     async def __init__(self, links: list):
         self.links = links
         self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.firefox.launch(headless=False, timeout=60000)
+        self.browser = await self.playwright.firefox.launch(headless=True, timeout=60000)
         self.context = await self.browser.new_context(
             # ignore_https_errors=True,
         )
@@ -39,20 +39,23 @@ class Umico:
         title = await self.page.locator('h1[itemprop="name"]').text_content()
         # title = await title.inner_text()
         print(title)
-        button = await self.page.locator('a:has-text("Цены всех продавцов")').click()
+        # button = await self.page.locator('a:has-text("Цены всех продавцов")').click()
 
-        # await button.click()
+        try:
+            button = await self.page.query_selector('a:has-text("Цены всех продавцов")')
+            await button.click()
+            # Находим элемент на странице с помощью селектора CSS или XPath
+            elements = await self.page.query_selector_all('div.MPProductOffer')
 
-        # Находим элемент на странице с помощью селектора CSS или XPath
-        elements = await self.page.query_selector_all('div.MPProductOffer')
-
-        # Получаем текст элемента
-        for element in elements:
-            shop = await element.query_selector('a.NameMerchant')
-            shop = await shop.inner_text()
-            price = await element.query_selector('span.MPPrice-RetailPrice')
-            price = await price.inner_text()
-            print(shop, re.sub(r"[^0-9.]", "", price))
+            # Получаем текст элемента
+            for element in elements:
+                shop = await element.query_selector('a.NameMerchant')
+                shop = await shop.inner_text()
+                price = await element.query_selector('span.MPPrice-RetailPrice')
+                price = await price.inner_text()
+                print(shop, re.sub(r"[^0-9.]", "", price))
+        except:
+            pass
 
     async def parse_price(self):
         for link in tqdm(self.links):
@@ -65,4 +68,4 @@ async def main():
     await a.page.close()
     await a.browser.close()
 
-asyncio.run(main())
+# asyncio.run(main())
